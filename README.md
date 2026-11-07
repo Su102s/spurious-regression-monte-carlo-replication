@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/34519558/README.md)
 # Spurious Regressions in Return Predictability — a Monte Carlo study
 
 Can a variable that has **nothing to do with stock returns** still look like a significant predictor?
@@ -11,7 +10,9 @@ Ferson, Sarkissian & Simin (2003), *"Spurious Regressions in Financial Economics
 
 Predictive regressions of the form
 
-$$r_{t+1} = a + b\,Z_t + e_{t+1}$$
+```math
+r_{t+1} = a + b\,Z_t + e_{t+1}
+```
 
 are everywhere in empirical finance (dividend yield, term spread, book-to-market …).
 Most popular predictors are **highly persistent** (monthly autocorrelation above 0.9).
@@ -22,17 +23,17 @@ predictor produce |t| > 1.96?
 
 | Component | Model |
 |---|---|
-| True expected return (unobserved) | $Z^*_t = \rho^* Z^*_{t-1} + v_t$ |
-| Realised return | $r_{t+1} = Z^*_t + u_{t+1}$, with $\mathrm{Var}(Z^*)/\mathrm{Var}(r) = R^{2*}$ |
-| Candidate predictor | $Z_t = \rho Z_{t-1} + w_t$, **independent** of $Z^*$ and $u$ |
+| True expected return (unobserved) | $`Z^*_t = \rho^* Z^*_{t-1} + v_t`$ |
+| Realised return | $`r_{t+1} = Z^*_t + u_{t+1}`$, with $`\mathrm{Var}(Z^*)/\mathrm{Var}(r) = R^{2*}`$ |
+| Candidate predictor | $`Z_t = \rho Z_{t-1} + w_t`$, **independent** of $`Z^*`$ and $`u`$ |
 
-- The true slope on $Z_t$ is exactly zero, so every rejection is a false positive.
-- Grid: $\rho = \rho^* \in \{0, 0.15, 0.5, 0.9, 0.95, 0.98, 0.99\}$,
-  $R^{2*} \in \{0, 0.001, 0.005, 0.01, 0.05, 0.10, 0.15\}$,
-  $T \in \{60, 360, 960\}$ months.
+- The true slope on $`Z_t`$ is exactly zero, so every rejection is a false positive.
+- Grid: $`\rho = \rho^* \in \{0, 0.15, 0.5, 0.9, 0.95, 0.98, 0.99\}`$,
+  $`R^{2*} \in \{0, 0.001, 0.005, 0.01, 0.05, 0.10, 0.15\}`$,
+  $`T \in \{60, 360, 960\}`$ months.
 - 10,000 simulated samples per cell; two-sided 5% t-test using
   (i) classical OLS standard errors and (ii) Newey-West HAC standard errors
-  with the automatic lag rule $\lfloor 4(T/100)^{2/9} \rfloor$.
+  with the automatic lag rule $`\lfloor 4(T/100)^{2/9} \rfloor`$.
 - All regressions are vectorised in NumPy (no loop over samples); the full grid runs in about a minute.
 
 This is a study **in the spirit of** the paper, not an exact replication of its tables:
@@ -40,7 +41,7 @@ the grid, sample sizes and lag rule are my own choices.
 
 ## Results
 
-Rejection rate of $H_0: b = 0$ with OLS standard errors, $T = 360$ (nominal size 5%):
+Rejection rate of $`H_0: b = 0`$ with OLS standard errors, $`T = 360`$ (nominal size 5%):
 
 | ρ = ρ* | R²* = 0 | R²* = 0.05 | R²* = 0.10 | R²* = 0.15 |
 |---|---|---|---|---|
@@ -52,11 +53,11 @@ Rejection rate of $H_0: b = 0$ with OLS standard errors, $T = 360$ (nominal size
 Full results for every cell and both standard errors: [`results/rejection_rates.csv`](results/rejection_rates.csv).
 
 **1. Persistence alone is not enough — persistent expected returns are the trigger.**
-When $R^{2*} = 0$ (returns are unpredictable noise), the test has the correct 5% size even with
-$\rho = 0.99$. The problem appears only when the *returns themselves* contain a slow-moving
+When $`R^{2*} = 0`$ (returns are unpredictable noise), the test has the correct 5% size even with
+$`\rho = 0.99`$. The problem appears only when the *returns themselves* contain a slow-moving
 expected component. A persistent regressor then "picks up" that slow component by chance in a finite sample.
 
-**2. The t-statistic is far too dispersed.** With $\rho = 0.99$, $R^{2*} = 0.10$, $T = 360$,
+**2. The t-statistic is far too dispersed.** With $`\rho = 0.99`$, $`R^{2*} = 0.10`$, $`T = 360`$,
 roughly a third of irrelevant predictors look significant.
 
 ![t-statistic distribution](figures/tstat_distribution.png)
@@ -67,14 +68,14 @@ false-positive rate *rises* with the sample length (OLS: 9% → 34% → 47%).
 ![Rejection by sample size](figures/rejection_by_sample_size.png)
 
 **4. Newey-West standard errors are not a cure.** They reduce the over-rejection only a little
-in long samples (47% → 41% at $T = 960$), and in short samples they over-reject even when there
-is no persistence at all (about 9% at $T = 60$), a known small-sample bias of HAC estimators.
+in long samples (47% → 41% at $`T = 960`$), and in short samples they over-reject even when there
+is no persistence at all (about 9% at $`T = 60`$), a known small-sample bias of HAC estimators.
 
 ## Extension: data mining on top of spurious regression
 
 In practice a researcher rarely tests one predictor. Suppose they try **K independent candidate
 predictors** on the same return series (none related to returns) and report only the one with the
-largest |t|. This is what [`run_data_mining.py`](run_data_mining.py) simulates ($T = 360$, 10,000 samples).
+largest |t|. This is what [`run_data_mining.py`](run_data_mining.py) simulates ($`T = 360`$, 10,000 samples).
 
 ![Data mining](figures/data_mining.png)
 
@@ -90,10 +91,10 @@ true 5% test in parentheses (OLS standard errors):
 | 100 | 99.5% (3.50) | 99.5% (4.61) | 99.0% (6.90) |
 
 **5. The two problems reinforce each other.** Mining alone follows the textbook formula
-$1 - 0.95^K$ (the first column, a check on the code). With persistent predictors and persistent
+$`1 - 0.95^K`$ (the first column, a check on the code). With persistent predictors and persistent
 expected returns, the curve shifts sharply up: trying just **5** candidates yields a "significant"
 predictor in 77% of samples. Equivalently, the hurdle for genuine 5% significance rises from
-1.96 to about **5.5** — a predictor with $|t| = 3$ would be entirely unremarkable.
+1.96 to about **5.5** — a predictor with $`|t| = 3`$ would be entirely unremarkable.
 
 ## Why it matters
 
@@ -131,7 +132,7 @@ python make_figures.py           # writes figures/*.png
 
 - Correlated (rather than independent) candidate predictors, as real predictor sets usually are.
 - Correlated innovations between returns and the predictor (Stambaugh, 1999, small-sample bias).
-- Simulation-based or bootstrap critical values, and out-of-sample $R^2$ as an alternative yardstick.
+- Simulation-based or bootstrap critical values, and out-of-sample $`R^2`$ as an alternative yardstick.
 
 ## Reference
 
